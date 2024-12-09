@@ -1,18 +1,12 @@
 # ~/.zshrc
 
-# Ensure zsh-snap is installed
-if [[ ! -f ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.zsh ]]; then
-    mkdir -p ${ZDOTDIR:-$HOME}/.zsh_plugins
-    git clone --depth 1 https://github.com/marlonrichert/zsh-snap.git ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap
-fi
-
 # Source zsh-snap
 source ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.zsh
 
 # Load the Powerlevel10k prompt
 znap prompt romkatv/powerlevel10k
 
-# Load other plugins as needed
+# Load other plugins
 znap eval zsh-users/zsh-autosuggestions 'ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"'
 znap eval zdharma-continuum/fast-syntax-highlighting
 

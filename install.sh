@@ -116,10 +116,11 @@ function symlink_configs {
 # Force plugin installation
 #####################################
 function force_plugin_install {
-    # By starting an interactive zsh session and running `znap update`,
-    # we ensure that all plugins, including p10k, are installed immediately.
     info "Forcing plugin installation via znap update..."
-    zsh -i -c "znap update"
+    # Run zsh in interactive mode to load zsh-snap and run znap commands
+    zsh -i -c "znap update" || {
+        error "Failed to run znap update. Please ensure zsh-snap is installed correctly."
+    }
 }
 
 #####################################
