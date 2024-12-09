@@ -34,28 +34,8 @@ function is_ubuntu {
 }
 
 #####################################
-# Ensure required tools are installed
+# Install zsh if needed
 #####################################
-function install_git {
-    if ! command -v git &> /dev/null; then
-        info "Installing git..."
-        if is_macos; then
-            if ! command -v brew &> /dev/null; then
-                info "Homebrew not installed. Installing Homebrew..."
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            fi
-            brew install git
-        elif is_ubuntu; then
-            sudo apt update
-            sudo apt install -y git
-        else
-            error "Unsupported OS. Only macOS and Ubuntu are supported."
-        fi
-    else
-        info "git is already installed."
-    fi
-}
-
 function install_zsh {
     if ! command -v zsh &> /dev/null; then
         info "zsh not found. Installing zsh..."
@@ -76,13 +56,15 @@ function install_zsh {
     fi
 }
 
+#####################################
+# Set zsh as the default shell
+#####################################
 function set_default_shell_to_zsh {
     local zsh_path
     zsh_path="$(which zsh)"
 
     if [[ "$SHELL" != "$zsh_path" ]]; then
         info "Setting zsh as the default shell..."
-        # Add zsh to /etc/shells if needed
         if ! grep -q "$zsh_path" /etc/shells; then
             echo "$zsh_path" | sudo tee -a /etc/shells
         fi
@@ -109,7 +91,7 @@ function install_znap {
 }
 
 #####################################
-# Symlink config files
+# Symlink configuration files
 #####################################
 function symlink_configs {
     info "Symlinking configuration files..."
@@ -131,17 +113,26 @@ function symlink_configs {
 }
 
 #####################################
+# Force plugin installation
+#####################################
+function force_plugin_install {
+    # By starting an interactive zsh session and running `znap update`,
+    # we ensure that all plugins, including p10k, are installed immediately.
+    info "Forcing plugin installation via znap update..."
+    zsh -i -c "znap update"
+}
+
+#####################################
 # Main
 #####################################
 function main {
     info "Starting setup..."
-    install_git
     install_zsh
     set_default_shell_to_zsh
     install_znap
     symlink_configs
-
-    info "Setup complete! Open a new terminal or run 'zsh' to use your new setup."
+    force_plugin_install
+    info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
 }
 
 main
