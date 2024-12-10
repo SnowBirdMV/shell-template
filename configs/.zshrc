@@ -1,10 +1,7 @@
 # ~/.zshrc
 
-# Load the zsh/mapfile module, required by zsh-snap
-zmodload zsh/mapfile
-
-# Source zsh-snap
-source "${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.plugin.zsh"
+# Source znap
+source "${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/znap.zsh"
 
 # Load the Powerlevel10k prompt
 znap prompt romkatv/powerlevel10k

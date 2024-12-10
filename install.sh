@@ -26,21 +26,20 @@ function is_macos {
 function is_ubuntu {
     if [ -f "/etc/os-release" ]; then
         . /etc/os-release
-        if [[ "$ID" == "ubuntu" ]]; then
-            return 0
-        fi
+        [[ "$ID" == "ubuntu" ]]
+    else
+        return 1
     fi
-    return 1
 }
 
 #####################################
 # Install zsh if needed
 #####################################
 function install_zsh {
-    if ! command -v zsh &> /dev/null; then
+    if ! command -v zsh &>/dev/null; then
         info "zsh not found. Installing zsh..."
         if is_macos; then
-            if ! command -v brew &> /dev/null; then
+            if ! command -v brew &>/dev/null; then
                 info "Homebrew not installed. Installing Homebrew..."
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
@@ -116,10 +115,10 @@ function symlink_configs {
 # Force plugin installation
 #####################################
 function force_plugin_install {
-    info "Forcing plugin installation via znap update..."
-    # Source znap directly before running znap commands
-    zsh -i -c "source ~/.zsh_plugins/zsh-snap/znap.zsh && znap update" || {
-        error "Failed to run znap update. Please ensure zsh-snap is installed correctly."
+    info "Forcing plugin installation via znap pull..."
+    # Run zsh interactively, source znap, and run `znap pull` to fetch all plugins
+    zsh -i -c "source ~/.zsh_plugins/zsh-snap/znap.zsh && znap pull" || {
+        error "Failed to run znap pull. Please ensure zsh-snap is installed correctly."
     }
 }
 
