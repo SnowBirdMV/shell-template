@@ -1,23 +1,24 @@
-# Enable Powerlevel10k instant prompt if desired
+# Enable Powerlevel10k instant prompt at the top if you have it
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Disable P10K configuration wizard
+# Disable Powerlevel10k configuration wizard
 POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
-# Source zsh-snap (Znap)
+# Source znap
 source "${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/znap.zsh"
 
-# Source your custom Powerlevel10k configuration before loading the prompt
-# so that all variables are set by the time the prompt initializes.
+# Load Powerlevel10k prompt
+# (Your .p10k.zsh should be sourced after the prompt is loaded if you're not reloading the prompt)
 if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi
-
-# Now load the Powerlevel10k prompt with your custom config in place
 znap prompt romkatv/powerlevel10k
 
-# Load other plugins
-znap eval zsh-users/zsh-autosuggestions 'ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"'
-znap eval zdharma-continuum/fast-syntax-highlighting
+# Set zsh-autosuggestions style before loading it
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"
+znap source zsh-users/zsh-autosuggestions
+
+# Load fast-syntax-highlighting
+znap source zdharma-continuum/fast-syntax-highlighting
