@@ -5,9 +5,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# ~/.zshrc
+# Disable P10K configuration wizard
+POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
-# Source znap
+# Source znap (zsh-snap)
 source "${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/znap.zsh"
 
 # Load the Powerlevel10k prompt

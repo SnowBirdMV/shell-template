@@ -46,12 +46,16 @@ function install_zsh {
             brew install zsh
         elif is_ubuntu; then
             sudo apt update
-            sudo apt install -y zsh
+            sudo apt install -y zsh wget unzip fontconfig
         else
             error "Unsupported OS. Only macOS and Ubuntu are supported."
         fi
     else
         info "zsh is already installed."
+        if is_ubuntu; then
+            sudo apt update
+            sudo apt install -y wget unzip fontconfig
+        fi
     fi
 }
 
@@ -90,6 +94,25 @@ function install_znap {
 }
 
 #####################################
+# Install Nerd Font for P10K Icons
+#####################################
+function install_nerd_font {
+    info "Installing JetBrainsMono Nerd Font..."
+    mkdir -p ~/.local/share/fonts
+    cd ~/.local/share/fonts
+
+    if [ ! -f "JetBrains Mono Regular Nerd Font Complete.ttf" ] && [ ! -f "JetBrainsMono-Regular Nerd Font Complete.ttf" ]; then
+        wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip
+        unzip JetBrainsMono.zip
+        rm JetBrainsMono.zip
+        fc-cache -fv
+    else
+        info "Nerd Font already installed."
+    fi
+    cd - > /dev/null
+}
+
+#####################################
 # Symlink configuration files
 #####################################
 function symlink_configs {
@@ -116,7 +139,6 @@ function symlink_configs {
 #####################################
 function force_plugin_install {
     info "Forcing plugin installation via znap pull..."
-    # Run zsh interactively, source znap, and run `znap pull` to fetch all plugins
     zsh -i -c "source ~/.zsh_plugins/zsh-snap/znap.zsh && znap pull" || {
         error "Failed to run znap pull. Please ensure zsh-snap is installed correctly."
     }
@@ -130,9 +152,11 @@ function main {
     install_zsh
     set_default_shell_to_zsh
     install_znap
+    install_nerd_font
     symlink_configs
     force_plugin_install
     info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
+    info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
 }
 
 main
