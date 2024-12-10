@@ -1,7 +1,7 @@
 # ~/.zshrc
 
 # Source zsh-snap
-source ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.plugin.zsh
+source ~/.zsh_plugins/zsh-snap/zsh-snap.zsh
 
 # Load the Powerlevel10k prompt
 znap prompt romkatv/powerlevel10k
@@ -10,10 +10,7 @@ znap prompt romkatv/powerlevel10k
 znap eval zsh-users/zsh-autosuggestions 'ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"'
 znap eval zdharma-continuum/fast-syntax-highlighting
 
-# Source Powerlevel10k configuration
+# Source your Powerlevel10k configuration
 if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi
-
-# Update plugins in the background
-znap update &
