@@ -1,7 +1,10 @@
 # ~/.zshrc
 
+# Load the zsh/mapfile module, required by zsh-snap
+zmodload zsh/mapfile
+
 # Source zsh-snap
-source ~/.zsh_plugins/zsh-snap/zsh-snap.zsh
+source "${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.plugin.zsh"
 
 # Load the Powerlevel10k prompt
 znap prompt romkatv/powerlevel10k
@@ -10,7 +13,7 @@ znap prompt romkatv/powerlevel10k
 znap eval zsh-users/zsh-autosuggestions 'ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8"'
 znap eval zdharma-continuum/fast-syntax-highlighting
 
-# Source your Powerlevel10k configuration
+# Source Powerlevel10k configuration if present
 if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi

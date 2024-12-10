@@ -117,9 +117,8 @@ function symlink_configs {
 #####################################
 function force_plugin_install {
     info "Forcing plugin installation via znap update..."
-    # Instead of relying on .zshrc, directly source zsh-snap and run znap update.
-    # This ensures that even if this is the first time, plugins get installed.
-    zsh -i -c "source ~/.zsh_plugins/zsh-snap/zsh-snap.zsh && znap update" || {
+    # We load the module and source zsh-snap directly before running znap update.
+    zsh -i -c "zmodload zsh/mapfile; source ~/.zsh_plugins/zsh-snap/zsh-snap.plugin.zsh && znap update" || {
         error "Failed to run znap update. Please ensure zsh-snap is installed correctly."
     }
 }
