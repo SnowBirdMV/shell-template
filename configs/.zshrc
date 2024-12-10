@@ -1,7 +1,7 @@
 # ~/.zshrc
 
 # Source zsh-snap
-source ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.zsh
+source ${ZDOTDIR:-$HOME}/.zsh_plugins/zsh-snap/zsh-snap.plugin.zsh
 
 # Load the Powerlevel10k prompt
 znap prompt romkatv/powerlevel10k
@@ -15,5 +15,5 @@ if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi
 
-# Update plugins in the background on new shells
+# Update plugins in the background
 znap update &
