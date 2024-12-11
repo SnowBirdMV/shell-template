@@ -40,7 +40,7 @@ fi
 # Install zsh-snap (Znap) if not already installed
 if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
     info "Installing zsh-snap (Znap)..."
-    git clone https://github.com/marlonrichert/znap "$HOME/.zsh_plugins/zsh-snap"
+    git clone https://github.com/marlonrichert/znap.git "$HOME/.zsh_plugins/zsh-snap"
     info "zsh-snap installed successfully."
 else
     info "zsh-snap is already installed."
