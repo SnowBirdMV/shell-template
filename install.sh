@@ -3,9 +3,6 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-# Enable debugging (optional, remove in production)
-# set -x
-
 # Define the script directory
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -85,14 +82,14 @@ ln -sf "$SCRIPT_DIR/configs/.p10k.zsh" "$HOME/.p10k.zsh"
 
 # Verify symlinks
 if [ -L "$HOME/.zshrc" ]; then
-    echo ".zshrc is correctly symlinked."
+    echo ".zshrc is correctly symlinked to $(readlink "$HOME/.zshrc")."
 else
     echo "Failed to symlink .zshrc." >&2
     exit 1
 fi
 
 if [ -L "$HOME/.p10k.zsh" ]; then
-    echo ".p10k.zsh is correctly symlinked."
+    echo ".p10k.zsh is correctly symlinked to $(readlink "$HOME/.p10k.zsh")."
 else
     echo "Failed to symlink .p10k.zsh." >&2
     exit 1
@@ -105,16 +102,12 @@ if [ -f "$HOME/.zshrc.zwc" ]; then
 fi
 
 # Ensure $HOME/.local/bin is on PATH in .zshrc
-if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.zshrc"; then
-    echo 'Adding $HOME/.local/bin to PATH in .zshrc...'
-    sed -i '1i export PATH="$HOME/.local/bin:$PATH"' "$HOME/.zshrc"
-fi
+# NOTE: Since .zshrc is now a symlink, any PATH modifications should be handled in configs/.zshrc
+# Therefore, remove any PATH modifications from the script
 
 # Ensure eval "$(zoxide init zsh)" is in .zshrc
-if ! grep -q 'eval "$(zoxide init zsh)"' "$HOME/.zshrc"; then
-    echo 'Adding zoxide initialization to .zshrc...'
-    echo 'eval "$(zoxide init zsh)"' >> "$HOME/.zshrc"
-fi
+# NOTE: Similarly, handle zoxide initialization within configs/.zshrc
+# Remove any zshrc modifications from the script
 
 # Ensure $HOME/.local/bin is on PATH for the script
 export PATH="$HOME/.local/bin:$PATH"

@@ -34,3 +34,6 @@ alias cd='z'
 if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi
+
+# Add $HOME/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
