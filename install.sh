@@ -17,9 +17,9 @@ sudo_require() {
 
 info "Starting setup..."
 
-# Check if running on macOS or Linux (Ubuntu) and install necessary packages
+# Determine OS type and install necessary packages
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # On macOS, ensure Homebrew is installed, then install necessary packages
+    # On macOS, ensure Homebrew is installed, then install required packages
     if ! command -v brew &> /dev/null; then
         info "Homebrew not found. Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -77,13 +77,12 @@ else
     info ".p10k.zsh is already symlinked."
 fi
 
-# Source znap before using it
-source "$HOME/.zsh_plugins/zsh-snap/znap.zsh"
-
 # Install Powerlevel10k prompt if not installed
+# No need to source here in bash; will happen in zsh when you start a new shell
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
-    info "Installing Powerlevel10k prompt..."
-    znap source romkatv/powerlevel10k
+    info "Installing Powerlevel10k prompt via znap..."
+    # We'll install it by invoking zsh, but not sourcing znap in bash
+    zsh -ic 'znap source romkatv/powerlevel10k'
     info "Powerlevel10k installed successfully."
 else
     info "Powerlevel10k is already installed."
@@ -98,7 +97,7 @@ fc-cache -fv
 rm "$FONT_ZIP"
 info "JetBrainsMono Nerd Font installed successfully."
 
-# Install zoxide if not installed (for Linux, we installed via apt or for macOS via brew)
+# Install zoxide if not installed
 if ! command -v zoxide &> /dev/null; then
     info "Installing zoxide..."
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
@@ -108,9 +107,9 @@ else
 fi
 
 # Install plugins via znap
-info "Installing zsh-autosuggestions and fast-syntax-highlighting plugins via znap..."
-znap source zsh-users/zsh-autosuggestions
-znap source zdharma-continuum/fast-syntax-highlighting
+# We can trigger the install by running zsh commands directly
+info "Installing zsh-autosuggestions and fast-syntax-highlighting via znap..."
+zsh -ic 'znap source zsh-users/zsh-autosuggestions; znap source zdharma-continuum/fast-syntax-highlighting'
 info "Plugins installed successfully."
 
 # Final message
@@ -119,4 +118,3 @@ info "Don't forget to change your terminal font to JetBrainsMono Nerd Font for p
 info "Ensure your .zshrc includes the following lines for zoxide:"
 echo "  eval \"\$(zoxide init zsh)\""
 echo "  alias cd='zoxide cd'"
-
