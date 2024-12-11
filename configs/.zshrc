@@ -1,3 +1,6 @@
+# Add $HOME/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
 # Enable Powerlevel10k instant prompt at the top if available
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -34,6 +37,3 @@ alias cd='z'
 if [ -f ~/.p10k.zsh ]; then
     source ~/.p10k.zsh
 fi
-
-# Add $HOME/.local/bin to PATH
-export PATH="$HOME/.local/bin:$PATH"
