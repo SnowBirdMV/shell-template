@@ -37,23 +37,10 @@ else
     info "zsh is already the default shell."
 fi
 
-# Clone the shell-template repository if not already cloned
-if [ ! -d "$HOME/shell-template" ]; then
-    info "Cloning shell-template repository..."
-    git clone https://github.com/SnowBirdMV/shell-template.git
-else
-    info "shell-template repository already exists."
-fi
-
-cd shell-template
-
-# Make install.sh executable (if not already)
-chmod +x install.sh
-
 # Install zsh-snap (Znap) if not already installed
 if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
     info "Installing zsh-snap (Znap)..."
-    git clone https://github.com/marlonrichert/znap ~/.zsh_plugins/zsh-snap
+    git clone https://github.com/marlonrichert/znap "$HOME/.zsh_plugins/zsh-snap"
     info "zsh-snap installed successfully."
 else
     info "zsh-snap is already installed."
@@ -62,18 +49,21 @@ fi
 # Symlink configuration files if not already symlinked
 info "Symlinking configuration files..."
 if [ ! -L "$HOME/.zshrc" ]; then
-    ln -sf "$PWD/.zshrc" "$HOME/.zshrc"
+    ln -sf "$(pwd)/.zshrc" "$HOME/.zshrc"
     info "Symlinked .zshrc successfully."
 else
     info ".zshrc is already symlinked."
 fi
 
 if [ ! -L "$HOME/.p10k.zsh" ]; then
-    ln -sf "$PWD/.p10k.zsh" "$HOME/.p10k.zsh"
+    ln -sf "$(pwd)/.p10k.zsh" "$HOME/.p10k.zsh"
     info "Symlinked .p10k.zsh successfully."
 else
     info ".p10k.zsh is already symlinked."
 fi
+
+# Source znap before using it
+source "$HOME/.zsh_plugins/zsh-snap/znap.zsh"
 
 # Install Powerlevel10k via znap if not already installed
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
@@ -86,10 +76,11 @@ fi
 
 # Install JetBrainsMono Nerd Font
 info "Installing JetBrainsMono Nerd Font..."
-wget -O JetBrainsMono.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip
-unzip -o JetBrainsMono.zip -d ~/.local/share/fonts
+FONT_ZIP="JetBrainsMono.zip"
+wget -O "$FONT_ZIP" https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip
+unzip -o "$FONT_ZIP" -d "$HOME/.local/share/fonts"
 fc-cache -fv
-rm JetBrainsMono.zip
+rm "$FONT_ZIP"
 info "JetBrainsMono Nerd Font installed successfully."
 
 # Install zoxide
@@ -111,6 +102,3 @@ info "Plugins installed successfully."
 # Final message
 info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
 info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
-info "Ensure your .zshrc includes the following lines for zoxide:"
-echo "  eval \"\$(zoxide init zsh)\""
-echo "  alias cd='zoxide cd'"
