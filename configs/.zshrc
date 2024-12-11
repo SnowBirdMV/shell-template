@@ -27,9 +27,6 @@ znap source zsh-users/zsh-autosuggestions
 # Source fast-syntax-highlighting plugin
 znap source zdharma-continuum/fast-syntax-highlighting
 
-# Source zsh-lsd plugin
-znap source z-shell/zsh-lsd
-
 # Initialize zoxide
 eval "$(zoxide init zsh)"
 
