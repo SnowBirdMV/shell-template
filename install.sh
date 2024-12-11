@@ -49,14 +49,14 @@ fi
 # Symlink configuration files if not already symlinked
 info "Symlinking configuration files..."
 if [ ! -L "$HOME/.zshrc" ]; then
-    ln -sf "$(pwd)/.zshrc" "$HOME/.zshrc"
+    ln -sf "$(pwd)/config/.zshrc" "$HOME/.zshrc"
     info "Symlinked .zshrc successfully."
 else
     info ".zshrc is already symlinked."
 fi
 
 if [ ! -L "$HOME/.p10k.zsh" ]; then
-    ln -sf "$(pwd)/.p10k.zsh" "$HOME/.p10k.zsh"
+    ln -sf "$(pwd)/config/.p10k.zsh" "$HOME/.p10k.zsh"
     info "Symlinked .p10k.zsh successfully."
 else
     info ".p10k.zsh is already symlinked."
@@ -102,3 +102,6 @@ info "Plugins installed successfully."
 # Final message
 info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
 info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
+info "Ensure your .zshrc includes the following lines for zoxide:"
+echo "  eval \"\$(zoxide init zsh)\""
+echo "  alias cd='zoxide cd'"
