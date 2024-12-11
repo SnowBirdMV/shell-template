@@ -3,6 +3,9 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Define the script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Function to prompt for password when necessary
 sudo_require() {
     sudo -v
@@ -47,9 +50,29 @@ if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
     git clone https://github.com/marlonrichert/zsh-snap.git "$HOME/.zsh_plugins/zsh-snap" >/dev/null 2>&1
 fi
 
-# Symlink configuration files (force symlink)
-ln -sf "$(pwd)/configs/.zshrc" "$HOME/.zshrc" >/dev/null 2>&1
-ln -sf "$(pwd)/configs/.p10k.zsh" "$HOME/.p10k.zsh" >/dev/null 2>&1
+# Verify that configs/.zshrc and configs/.p10k.zsh exist
+if [ ! -f "$SCRIPT_DIR/configs/.zshrc" ]; then
+    echo "Error: $SCRIPT_DIR/configs/.zshrc does not exist."
+    exit 1
+fi
+
+if [ ! -f "$SCRIPT_DIR/configs/.p10k.zsh" ]; then
+    echo "Error: $SCRIPT_DIR/configs/.p10k.zsh does not exist."
+    exit 1
+fi
+
+# Remove existing .zshrc and .p10k.zsh if they exist (whether regular files or symlinks)
+if [ -e "$HOME/.zshrc" ]; then
+    rm -f "$HOME/.zshrc"
+fi
+
+if [ -e "$HOME/.p10k.zsh" ]; then
+    rm -f "$HOME/.p10k.zsh"
+fi
+
+# Symlink configuration files
+ln -s "$SCRIPT_DIR/configs/.zshrc" "$HOME/.zshrc" >/dev/null 2>&1
+ln -s "$SCRIPT_DIR/configs/.p10k.zsh" "$HOME/.p10k.zsh" >/dev/null 2>&1
 
 # Remove existing .zshrc.zwc if it exists
 if [ -f "$HOME/.zshrc.zwc" ]; then
@@ -67,10 +90,21 @@ if ! grep -q 'eval "$(zoxide init zsh)"' "$HOME/.zshrc"; then
     echo 'eval "$(zoxide init zsh)"' >> "$HOME/.zshrc"
 fi
 
+# Ensure $HOME/.local/bin is on PATH for the script
+export PATH="$HOME/.local/bin:$PATH"
+
+# Install zoxide if not installed
+if ! command -v zoxide &> /dev/null; then
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
+fi
+
 # Install Powerlevel10k prompt if not installed
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
     zsh -ic 'znap source romkatv/powerlevel10k' >/dev/null 2>&1
 fi
+
+# Install zsh-autosuggestions and fast-syntax-highlighting via znap
+zsh -ic 'znap source zsh-users/zsh-autosuggestions; znap source zdharma-continuum/fast-syntax-highlighting' >/dev/null 2>&1
 
 # Install JetBrainsMono Nerd Font
 FONT_ZIP="JetBrainsMono.zip"
@@ -78,14 +112,6 @@ wget -q -O "$FONT_ZIP" https://github.com/ryanoasis/nerd-fonts/releases/download
 unzip -o "$FONT_ZIP" -d "$HOME/.local/share/fonts" >/dev/null 2>&1
 fc-cache -fv >/dev/null 2>&1
 rm "$FONT_ZIP"
-
-# Install zoxide if not installed
-if ! command -v zoxide &> /dev/null; then
-    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash >/dev/null 2>&1
-fi
-
-# Install plugins via znap
-zsh -ic 'znap source zsh-users/zsh-autosuggestions; znap source zdharma-continuum/fast-syntax-highlighting' >/dev/null 2>&1
 
 # Final message
 echo "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
