@@ -28,7 +28,7 @@ znap source zdharma-continuum/fast-syntax-highlighting
 eval "$(zoxide init zsh)"
 
 # Alias 'cd' to zoxide's 'cd' command
-alias cd='zoxide cd'
+alias cd='z'
 
 # Load your Powerlevel10k configuration if it exists
 if [ -f ~/.p10k.zsh ]; then
