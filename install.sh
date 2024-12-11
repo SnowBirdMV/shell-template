@@ -17,15 +17,29 @@ sudo_require() {
 
 info "Starting setup..."
 
-# Ensure zsh is installed
-if ! command -v zsh &> /dev/null; then
-    info "zsh not found. Installing zsh..."
+# Check if running on macOS or Linux (Ubuntu) and install necessary packages
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # On macOS, ensure Homebrew is installed, then install necessary packages
+    if ! command -v brew &> /dev/null; then
+        info "Homebrew not found. Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    info "Installing required packages via Homebrew..."
+    brew install zsh git wget unzip fontconfig zoxide
+else
+    # On Ubuntu/Debian
+    info "Updating apt and installing required packages..."
     sudo_require
     sudo apt update
-    sudo apt install -y zsh wget unzip fontconfig
-    info "zsh installed successfully."
+    sudo apt install -y zsh git wget unzip fontconfig curl
+fi
+
+# Ensure zsh is installed
+if ! command -v zsh &> /dev/null; then
+    info "zsh installation failed. Please install zsh and re-run the script."
+    exit 1
 else
-    info "zsh is already installed."
+    info "zsh is installed."
 fi
 
 # Set zsh as the default shell
@@ -46,8 +60,9 @@ else
     info "zsh-snap is already installed."
 fi
 
-# Symlink configuration files if not already symlinked
+# Symlink configuration files
 info "Symlinking configuration files..."
+
 if [ ! -L "$HOME/.zshrc" ]; then
     ln -sf "$(pwd)/config/.zshrc" "$HOME/.zshrc"
     info "Symlinked .zshrc successfully."
@@ -65,7 +80,7 @@ fi
 # Source znap before using it
 source "$HOME/.zsh_plugins/zsh-snap/znap.zsh"
 
-# Install Powerlevel10k via znap if not already installed
+# Install Powerlevel10k prompt if not installed
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
     info "Installing Powerlevel10k prompt..."
     znap source romkatv/powerlevel10k
@@ -83,10 +98,9 @@ fc-cache -fv
 rm "$FONT_ZIP"
 info "JetBrainsMono Nerd Font installed successfully."
 
-# Install zoxide
+# Install zoxide if not installed (for Linux, we installed via apt or for macOS via brew)
 if ! command -v zoxide &> /dev/null; then
     info "Installing zoxide..."
-    # Download and install zoxide using its official install script
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
     info "zoxide installed successfully."
 else
@@ -101,7 +115,8 @@ info "Plugins installed successfully."
 
 # Final message
 info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
-info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
+info "Don't forget to change your terminal font to JetBrainsMono Nerd Font for proper icons."
 info "Ensure your .zshrc includes the following lines for zoxide:"
 echo "  eval \"\$(zoxide init zsh)\""
 echo "  alias cd='zoxide cd'"
+
