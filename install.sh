@@ -1,162 +1,116 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status
 set -e
 
-cd "$(dirname "$0")"
-
-#####################################
-# Helper functions
-#####################################
-function info {
-    echo -e "\033[1;32m[INFO]\033[0m $1"
+# Function to print informational messages
+info() {
+    echo "[INFO] $1"
 }
 
-function warn {
-    echo -e "\033[1;33m[WARN]\033[0m $1"
+# Function to prompt for password when necessary
+sudo_require() {
+    sudo -v
+    # Keep-alive: update existing sudo time stamp until the script has finished
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 }
 
-function error {
-    echo -e "\033[1;31m[ERROR]\033[0m $1"
-    exit 1
-}
+info "Starting setup..."
 
-function is_macos {
-    [[ "$(uname)" == "Darwin" ]]
-}
+# Ensure zsh is installed
+if ! command -v zsh &> /dev/null; then
+    info "zsh not found. Installing zsh..."
+    sudo_require
+    sudo apt update
+    sudo apt install -y zsh wget unzip fontconfig
+    info "zsh installed successfully."
+else
+    info "zsh is already installed."
+fi
 
-function is_ubuntu {
-    if [ -f "/etc/os-release" ]; then
-        . /etc/os-release
-        [[ "$ID" == "ubuntu" ]]
-    else
-        return 1
-    fi
-}
-
-#####################################
-# Install zsh if needed
-#####################################
-function install_zsh {
-    if ! command -v zsh &>/dev/null; then
-        info "zsh not found. Installing zsh..."
-        if is_macos; then
-            if ! command -v brew &>/dev/null; then
-                info "Homebrew not installed. Installing Homebrew..."
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            fi
-            brew install zsh
-        elif is_ubuntu; then
-            sudo apt update
-            sudo apt install -y zsh wget unzip fontconfig
-        else
-            error "Unsupported OS. Only macOS and Ubuntu are supported."
-        fi
-    else
-        info "zsh is already installed."
-        if is_ubuntu; then
-            sudo apt update
-            sudo apt install -y wget unzip fontconfig
-        fi
-    fi
-}
-
-#####################################
 # Set zsh as the default shell
-#####################################
-function set_default_shell_to_zsh {
-    local zsh_path
-    zsh_path="$(which zsh)"
+if [ "$SHELL" != "$(which zsh)" ]; then
+    info "Setting zsh as the default shell..."
+    sudo chsh -s "$(which zsh)" "$USER"
+    info "Default shell changed to zsh. Please log out and back in for changes to take effect."
+else
+    info "zsh is already the default shell."
+fi
 
-    if [[ "$SHELL" != "$zsh_path" ]]; then
-        info "Setting zsh as the default shell..."
-        if ! grep -q "$zsh_path" /etc/shells; then
-            echo "$zsh_path" | sudo tee -a /etc/shells
-        fi
-        chsh -s "$zsh_path"
-        info "Default shell changed to zsh. Please log out and back in for changes to take effect."
-    else
-        info "zsh is already the default shell."
-    fi
-}
+# Clone the shell-template repository if not already cloned
+if [ ! -d "$HOME/shell-template" ]; then
+    info "Cloning shell-template repository..."
+    git clone https://github.com/SnowBirdMV/shell-template.git
+else
+    info "shell-template repository already exists."
+fi
 
-#####################################
-# Install zsh-snap (Znap)
-#####################################
-function install_znap {
-    local znap_dir="$HOME/.zsh_plugins/zsh-snap"
-    if [ ! -d "$znap_dir" ]; then
-        info "Installing zsh-snap (Znap)..."
-        mkdir -p "${HOME}/.zsh_plugins"
-        git clone --depth 1 https://github.com/marlonrichert/zsh-snap.git "$znap_dir"
-    else
-        info "zsh-snap is already installed. Pulling latest..."
-        (cd "$znap_dir" && git pull)
-    fi
-}
+cd shell-template
 
-#####################################
-# Install Nerd Font for P10K Icons
-#####################################
-function install_nerd_font {
-    info "Installing JetBrainsMono Nerd Font..."
-    mkdir -p ~/.local/share/fonts
-    cd ~/.local/share/fonts
+# Make install.sh executable (if not already)
+chmod +x install.sh
 
-    if [ ! -f "JetBrains Mono Regular Nerd Font Complete.ttf" ] && [ ! -f "JetBrainsMono-Regular Nerd Font Complete.ttf" ]; then
-        wget https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip
-        unzip JetBrainsMono.zip
-        rm JetBrainsMono.zip
-        fc-cache -fv
-    else
-        info "Nerd Font already installed."
-    fi
-    cd - > /dev/null
-}
+# Install zsh-snap (Znap) if not already installed
+if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
+    info "Installing zsh-snap (Znap)..."
+    git clone https://github.com/marlonrichert/znap ~/.zsh_plugins/zsh-snap
+    info "zsh-snap installed successfully."
+else
+    info "zsh-snap is already installed."
+fi
 
-#####################################
-# Symlink configuration files
-#####################################
-function symlink_configs {
-    info "Symlinking configuration files..."
-    local CONFIG_DIR="$(pwd)/configs"
-    local FILES=(
-        ".zshrc"
-        ".p10k.zsh"
-    )
+# Symlink configuration files if not already symlinked
+info "Symlinking configuration files..."
+if [ ! -L "$HOME/.zshrc" ]; then
+    ln -sf "$PWD/.zshrc" "$HOME/.zshrc"
+    info "Symlinked .zshrc successfully."
+else
+    info ".zshrc is already symlinked."
+fi
 
-    for file in "${FILES[@]}"; do
-        local target="$HOME/$file"
-        if [ -e "$target" ] || [ -h "$target" ]; then
-            info "Backing up existing $target to $target.bak"
-            mv "$target" "$target.bak"
-        fi
-        ln -s "$CONFIG_DIR/$file" "$target"
-        info "Symlinked $file to $target"
-    done
-}
+if [ ! -L "$HOME/.p10k.zsh" ]; then
+    ln -sf "$PWD/.p10k.zsh" "$HOME/.p10k.zsh"
+    info "Symlinked .p10k.zsh successfully."
+else
+    info ".p10k.zsh is already symlinked."
+fi
 
-#####################################
-# Force plugin installation
-#####################################
-function force_plugin_install {
-    info "Forcing plugin installation via znap pull..."
-    zsh -i -c "source ~/.zsh_plugins/zsh-snap/znap.zsh && znap pull" || {
-        error "Failed to run znap pull. Please ensure zsh-snap is installed correctly."
-    }
-}
+# Install Powerlevel10k via znap if not already installed
+if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
+    info "Installing Powerlevel10k prompt..."
+    znap source romkatv/powerlevel10k
+    info "Powerlevel10k installed successfully."
+else
+    info "Powerlevel10k is already installed."
+fi
 
-#####################################
-# Main
-#####################################
-function main {
-    info "Starting setup..."
-    install_zsh
-    set_default_shell_to_zsh
-    install_znap
-    install_nerd_font
-    symlink_configs
-    force_plugin_install
-    info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
-    info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
-}
+# Install JetBrainsMono Nerd Font
+info "Installing JetBrainsMono Nerd Font..."
+wget -O JetBrainsMono.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/JetBrainsMono.zip
+unzip -o JetBrainsMono.zip -d ~/.local/share/fonts
+fc-cache -fv
+rm JetBrainsMono.zip
+info "JetBrainsMono Nerd Font installed successfully."
 
-main
+# Install zoxide
+if ! command -v zoxide &> /dev/null; then
+    info "Installing zoxide..."
+    # Download and install zoxide using its official install script
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+    info "zoxide installed successfully."
+else
+    info "zoxide is already installed."
+fi
+
+# Install plugins via znap
+info "Installing zsh-autosuggestions and fast-syntax-highlighting plugins via znap..."
+znap source zsh-users/zsh-autosuggestions
+znap source zdharma-continuum/fast-syntax-highlighting
+info "Plugins installed successfully."
+
+# Final message
+info "Setup complete! Open a new terminal or run 'zsh' to load your new configuration."
+info "Don't forget to change your terminal font to a Nerd Font (e.g., JetBrainsMono Nerd Font) for proper icons."
+info "Ensure your .zshrc includes the following lines for zoxide:"
+echo "  eval \"\$(zoxide init zsh)\""
+echo "  alias cd='zoxide cd'"
