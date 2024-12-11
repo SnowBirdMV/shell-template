@@ -62,7 +62,6 @@ fi
 
 # Symlink configuration files
 info "Symlinking configuration files..."
-
 if [ ! -L "$HOME/.zshrc" ]; then
     ln -sf "$(pwd)/configs/.zshrc" "$HOME/.zshrc"
     info "Symlinked .zshrc successfully."
@@ -77,9 +76,18 @@ else
     info ".p10k.zsh is already symlinked."
 fi
 
+# Ensure $HOME/.local/bin is on PATH in .zshrc so zoxide can run
+if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.zshrc"; then
+    info "Adding $HOME/.local/bin to PATH in .zshrc..."
+    # Insert at the top of .zshrc for immediate availability
+    sed -i '1i export PATH="$HOME/.local/bin:$PATH"' "$HOME/.zshrc"
+    info "Updated .zshrc with local bin directory."
+fi
+
 # Install Powerlevel10k prompt if not installed
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
     info "Installing Powerlevel10k prompt via znap..."
+    # Run in zsh to ensure the environment is correct
     zsh -ic 'znap source romkatv/powerlevel10k'
     info "Powerlevel10k installed successfully."
 else
