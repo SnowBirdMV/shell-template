@@ -47,13 +47,13 @@ if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
     git clone https://github.com/marlonrichert/zsh-snap.git "$HOME/.zsh_plugins/zsh-snap" >/dev/null 2>&1
 fi
 
-# Symlink configuration files
-if [ ! -L "$HOME/.zshrc" ]; then
-    ln -sf "$(pwd)/configs/.zshrc" "$HOME/.zshrc"
-fi
+# Symlink configuration files (force symlink)
+ln -sf "$(pwd)/configs/.zshrc" "$HOME/.zshrc" >/dev/null 2>&1
+ln -sf "$(pwd)/configs/.p10k.zsh" "$HOME/.p10k.zsh" >/dev/null 2>&1
 
-if [ ! -L "$HOME/.p10k.zsh" ]; then
-    ln -sf "$(pwd)/configs/.p10k.zsh" "$HOME/.p10k.zsh"
+# Remove existing .zshrc.zwc if it exists
+if [ -f "$HOME/.zshrc.zwc" ]; then
+    rm "$HOME/.zshrc.zwc"
 fi
 
 # Ensure $HOME/.local/bin is on PATH in .zshrc
@@ -65,11 +65,6 @@ fi
 # Ensure eval "$(zoxide init zsh)" is in .zshrc
 if ! grep -q 'eval "$(zoxide init zsh)"' "$HOME/.zshrc"; then
     echo 'eval "$(zoxide init zsh)"' >> "$HOME/.zshrc"
-fi
-
-# Add alias z='zoxide' to .zshrc if not present
-if ! grep -q "alias z='zoxide'" "$HOME/.zshrc"; then
-    echo "alias z='zoxide'" >> "$HOME/.zshrc"
 fi
 
 # Install Powerlevel10k prompt if not installed
