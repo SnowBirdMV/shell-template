@@ -51,7 +51,7 @@ else
     info "zsh is already the default shell."
 fi
 
-# Install zsh-snap (Znap) if not already installed
+# Install zsh-snap if not already installed
 if [ ! -d "$HOME/.zsh_plugins/zsh-snap" ]; then
     info "Installing zsh-snap (Znap)..."
     git clone https://github.com/marlonrichert/zsh-snap.git "$HOME/.zsh_plugins/zsh-snap"
@@ -64,24 +64,22 @@ fi
 info "Symlinking configuration files..."
 
 if [ ! -L "$HOME/.zshrc" ]; then
-    ln -sf "$(pwd)/config/.zshrc" "$HOME/.zshrc"
+    ln -sf "$(pwd)/configs/.zshrc" "$HOME/.zshrc"
     info "Symlinked .zshrc successfully."
 else
     info ".zshrc is already symlinked."
 fi
 
 if [ ! -L "$HOME/.p10k.zsh" ]; then
-    ln -sf "$(pwd)/config/.p10k.zsh" "$HOME/.p10k.zsh"
+    ln -sf "$(pwd)/configs/.p10k.zsh" "$HOME/.p10k.zsh"
     info "Symlinked .p10k.zsh successfully."
 else
     info ".p10k.zsh is already symlinked."
 fi
 
 # Install Powerlevel10k prompt if not installed
-# No need to source here in bash; will happen in zsh when you start a new shell
 if [ ! -d "$HOME/.zsh_plugins/romkatv/powerlevel10k" ]; then
     info "Installing Powerlevel10k prompt via znap..."
-    # We'll install it by invoking zsh, but not sourcing znap in bash
     zsh -ic 'znap source romkatv/powerlevel10k'
     info "Powerlevel10k installed successfully."
 else
@@ -107,7 +105,6 @@ else
 fi
 
 # Install plugins via znap
-# We can trigger the install by running zsh commands directly
 info "Installing zsh-autosuggestions and fast-syntax-highlighting via znap..."
 zsh -ic 'znap source zsh-users/zsh-autosuggestions; znap source zdharma-continuum/fast-syntax-highlighting'
 info "Plugins installed successfully."
